@@ -1,26 +1,16 @@
 // Import the functions you need from the SDKs you need
 import {initializeApp} from "firebase/app";
 import {
-	getAuth,
-	signInWithRedirect,
-	signInWithPopup,
-	GoogleAuthProvider,
 	createUserWithEmailAndPassword,
+	getAuth,
+	GoogleAuthProvider,
+	onAuthStateChanged,
 	signInWithEmailAndPassword,
-	signOut,
-	onAuthStateChanged
-}
-	from 'firebase/auth';
-import {
-	getFirestore,
-	doc,
-	setDoc,
-	getDoc,
-	collection,
-	writeBatch,
-	query,
-	getDocs
-} from 'firebase/firestore';
+	signInWithPopup,
+	signInWithRedirect,
+	signOut
+} from 'firebase/auth';
+import {collection, doc, getDoc, getDocs, getFirestore, query, setDoc, writeBatch} from 'firebase/firestore';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -58,18 +48,12 @@ export const addCollectionAndDocuments = async (collectionKey, objectsToAdd) => 
 	await batch.commit();
 }
 
-export const getCategoriesAndDocuments = async () => {
-	const collectionRef = collection(db, 'categories');
+export const getCategoriesAndDocuments = async (path) => {
+	const collectionRef = collection(db, path);
 	const q = query(collectionRef);
 
 	const querySnapshot = await getDocs(q);
-	const categoryMap = querySnapshot.docs.reduce((acc, docSnapshot) => {
-		const { title, items } = docSnapshot.data();
-		acc[title.toLowerCase()] = items;
-		return acc;
-	}, {});
-
-	return categoryMap;
+	return querySnapshot.docs.map((docSnapshot) => docSnapshot.data());
 }
 
 export const createUserDocumentFromAuth = async (userAuth, additionalInformation = {}) => {
